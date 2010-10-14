@@ -1,4 +1,4 @@
-=== Link Library ===
+=== Bilingual Linker ===
 Contributors: jackdewey
 Donate link: http://yannickcorner.nayanna.biz/wordpress-plugins/bilingual-linker
 Tags: translation, link, bilingual
