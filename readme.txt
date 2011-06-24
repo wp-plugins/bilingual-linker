@@ -3,7 +3,7 @@ Contributors: jackdewey
 Donate link: http://yannickcorner.nayanna.biz/wordpress-plugins/bilingual-linker
 Tags: translation, link, bilingual
 Requires at least: 3.0
-Tested up to: 3.1
+Tested up to: 3.2
 Stable tag: trunk
 
 The purpose of this plugin is to allow users to add a link to a translation version of a page or post in the admin and print this link on their blog, on a single post or or a page.
