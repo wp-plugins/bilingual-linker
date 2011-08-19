@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 1.0
+Version: 1.1
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 Network: true
@@ -62,6 +62,24 @@ if ( ! class_exists( 'BL_Admin' ) ) {
 			if ( function_exists('add_submenu_page') ) {
 				add_options_page('Bilingual Linker for Wordpress', 'Bilingual Linker', 9, basename(__FILE__), array('BL_Admin','config_page'));
 				add_filter( 'plugin_action_links', array( 'BL_Admin', 'filter_plugin_actions'), 10, 2 );
+			}
+			
+			if ( function_exists( 'get_post_types' ) )
+			{
+				$post_types = get_post_types( array(), 'objects' );
+				foreach ( $post_types as $post_type )
+				{
+					if ( $post_type->show_ui )
+					{
+						add_meta_box ('bilinguallinker_meta_box', __('Bilingual Linker - Additional Post / Page Parameters', 'bilingual-linker'), 'bl_postpage_edit_extra', $post_type->name, 'normal', 'high');
+					}
+				}
+			} 
+			else
+			{
+				add_meta_box ('bilinguallinker_meta_box', __('Bilingual Linker - Additional Post / Page Parameters', 'bilingual-linker'), 'bl_postpage_edit_extra', 'post', 'normal', 'high');
+
+				add_meta_box ('bilinguallinker_meta_box', __('Bilingual Linker - Additional Post / Page Parameters', 'bilingual-linker'), 'bl_postpage_edit_extra', 'page', 'normal', 'high');
 			}
 		} // end add_BL_config_page()
 
@@ -178,7 +196,7 @@ function bl_delete_post_field($post_id) {
 }
 
 
-add_action('admin_menu', array('BL_Admin','add_config_page'));
+add_action('admin_menu', array('BL_Admin','add_config_page'), 100);
 
 add_filter('admin_head', 'bl_admin_scripts'); // the_posts gets triggered before wp_head
 
@@ -210,10 +228,5 @@ function bl_postpage_edit_extra($post) {
     </table>
     <?php
 }
-
-add_meta_box ('bilinguallinker_meta_box', __('Bilingual Linker - Additional Post / Page Parameters', 'bilingual-linker'), 'bl_postpage_edit_extra', 'post', 'normal', 'high');
-
-add_meta_box ('bilinguallinker_meta_box', __('Bilingual Linker - Additional Post / Page Parameters', 'bilingual-linker'), 'bl_postpage_edit_extra', 'page', 'normal', 'high');
-
 
 ?>

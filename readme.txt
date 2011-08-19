@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 1.1 =
+* Added code to display Bilingual Linker on all post types, not only on posts and pages
+
 = 1.0 =
 * Initial functionality
 * Ability to add custom link for translated text in post and page editors
