@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 1.2.1 =
+* Fixed problem with posts extra field getting deleted
+
 = 1.2 =
 * Updated Bilingual Linker to support network installations
 * Changed data storage method to use post meta data instead of custom table
