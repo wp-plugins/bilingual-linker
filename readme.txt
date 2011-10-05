@@ -29,6 +29,10 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 1.2 =
+* Updated Bilingual Linker to support network installations
+* Changed data storage method to use post meta data instead of custom table
+
 = 1.1 =
 * Added code to display Bilingual Linker on all post types, not only on posts and pages
 

@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 1.1
+Version: 1.2
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 Network: true
@@ -20,37 +20,21 @@ require_once(ABSPATH . '/wp-admin/includes/template.php');
 
 function bilingual_linker_install() {
 	global $wpdb;
-
-    $charset_collate = '';
-	if ( version_compare(mysql_get_server_info(), '4.1.0', '>=') ) {
-		if (!empty($wpdb->charset)) {
-			$charset_collate .= " DEFAULT CHARACTER SET $wpdb->charset";
-		}
-		if (!empty($wpdb->collate)) {
-			$charset_collate .= " COLLATE $wpdb->collate";
-		}
-	}
 	
-	$charset_collate = '';
-	if ( version_compare(mysql_get_server_info(), '4.1.0', '>=') ) {
-		if (!empty($wpdb->charset)) {
-			$charset_collate .= " DEFAULT CHARACTER SET $wpdb->charset";
-		}
-		if (!empty($wpdb->collate)) {
-			$charset_collate .= " COLLATE $wpdb->collate";
+	$postextradataquery = "select * from " . $wpdb->get_blog_prefix() . "posts_extrainfo";
+	$extradata = $wpdb->get_results($postextradataquery, ARRAY_A);
+	
+	if ($extradata)
+	{
+		foreach($extradata as $datarec)
+		{
+			update_post_meta($datarec['post_id'], "bilingual-linker-other-lang-url", $datarec['post_otherlang_url']);
 		}
 	}
 	
 	$wpdb->posts_extrainfo = $wpdb->get_blog_prefix() .'posts_extrainfo';
 
-	$result = $wpdb->query("
-			CREATE TABLE IF NOT EXISTS `$wpdb->posts_extrainfo` (
-			`post_id` bigint(20) NOT NULL DEFAULT '0',
-			`post_otherlang_url` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-			PRIMARY KEY (`post_id`)
-			) $charset_collate");
-
-
+	$result = $wpdb->query("DROP TABLE `$wpdb->posts_extrainfo`");	
 }     
 
 if ( ! class_exists( 'BL_Admin' ) ) {
@@ -58,7 +42,6 @@ if ( ! class_exists( 'BL_Admin' ) ) {
 	class BL_Admin {
 
 		function add_config_page() {
-			global $wpdb;
 			if ( function_exists('add_submenu_page') ) {
 				add_options_page('Bilingual Linker for Wordpress', 'Bilingual Linker', 9, basename(__FILE__), array('BL_Admin','config_page'));
 				add_filter( 'plugin_action_links', array( 'BL_Admin', 'filter_plugin_actions'), 10, 2 );
@@ -158,14 +141,11 @@ if ( ! class_exists( 'BL_Admin' ) ) {
 
 function OutputBilingualLink($post_id, $linktext = "Translation", $beforelink = "<div class='BilingualLink'>", $afterlink = "</div>")
 {
-	global $wpdb;
+	$otherlangurl = get_post_meta($post_id, "bilingual-linker-other-lang-url", true);
 	
-	$postextradataquery = "select * from " . $wpdb->get_blog_prefix() . "posts_extrainfo where post_id = " . $post_id;
-	$extradata = $wpdb->get_row($postextradataquery, ARRAY_A);
-	
-	if ($extradata['post_otherlang_url'] != '')
+	if ($otherlangurl != '')
 	{
-		echo $beforelink . "<a href='" . $extradata['post_otherlang_url'] . "'>" . $linktext . "</a>" . $afterlink;
+		echo $beforelink . "<a href='" . $otherlangurl . "'>" . $linktext . "</a>" . $afterlink;
 	}
 }
 
@@ -175,24 +155,7 @@ function bl_admin_scripts() {
 }
 
 function bl_editsave_post_field($post_id) {
-	global $wpdb;
-	
-	$extradatatable = $wpdb->get_blog_prefix() . "posts_extrainfo";
-	
-	$postextradataquery = "select * from " . $wpdb->get_blog_prefix() . "posts_extrainfo where post_id = " . $post_id;
-	$extradata = $wpdb->get_row($postextradataquery, ARRAY_A);
-	
-	if ($extradata)
-		$wpdb->update( $extradatatable, array( 'post_otherlang_url' => $_POST['bl_otherlang_link'] ), array( 'post_id' => $post_id ));
-	else
-		$wpdb->insert( $extradatatable, array( 'post_id' => $post_id, 'post_otherlang_url' => $_POST['bl_otherlang_link']));
-}
-
-function bl_delete_post_field($post_id) {
-	global $wpdb;
-	
-	$deletequery = "delete from " . $wpdb->get_blog_prefix() . "posts_extrainfo where post_id = " . $post_id;
-	$wpdb->get_results($deletequery);
+	update_post_meta($post_id, "bilingual-linker-other-lang-url", $_POST['bl_otherlang_link']);
 }
 
 
@@ -204,17 +167,12 @@ add_action('edit_post', 'bl_editsave_post_field');
 
 add_action('save_post', 'bl_editsave_post_field');
 
-add_action('delete_post', 'bl_delete_post_field');
-
 register_activation_hook(BL_FILE, 'bilingual_linker_install');
 
 function bl_postpage_edit_extra($post) {
 	$genoptions = get_option('BilingualLinkerGeneral');
     
-    global $wpdb;
-    
-    $postextradataquery = "select * from " . $wpdb->get_blog_prefix() . "posts_extrainfo where post_id = " . $post->ID;
-	$extradata = $wpdb->get_row($postextradataquery, ARRAY_A);
+    $otherlangurl = get_post_meta($post->ID, "bilingual-linker-other-lang-url", true);
     ?>
     <table>
         <tr>
@@ -222,7 +180,7 @@ function bl_postpage_edit_extra($post) {
                 Alternate Language Link
             </td>
             <td>
-                <input type="text" id="bl_otherlang_link" name="bl_otherlang_link" size="80" value="<?php echo $extradata['post_otherlang_url']; ?>"/>
+                <input type="text" id="bl_otherlang_link" name="bl_otherlang_link" size="80" value="<?php echo $otherlangurl; ?>"/>
             </td>
         </tr>
     </table>
