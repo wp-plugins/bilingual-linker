@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 1.2.2 =
+* Added option to OutputBilingualLink to be able to provide a default URL to display if no translation link is found
+
 = 1.2.1 =
 * Fixed problem with posts extra field getting deleted
 
