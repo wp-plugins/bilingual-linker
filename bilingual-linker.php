@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 1.2.2
+Version: 1.2.3
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 Network: true
@@ -127,7 +127,7 @@ if ( ! class_exists( 'BL_Admin' ) ) {
 				<div><strong>Usage Instructions</strong></div>
 				<div>To use Bilingual Linker, just assign the web address for the translated version of a page or post when editing it in the Bilingual Linker box, then use the OutputBilingualLink function to display a link to the translation version of the page or post.<br /><br />
 				The arguments of the OutputBilingualLink are:<br />
-				<strong>OutputBilingualLink($post_id, $linktext, $beforelink, $afterlink, $defaulturl);</strong><br /><br />
+				<strong>OutputBilingualLink($post_id, $linktext, $beforelink, $afterlink, $defaulturl, $echo);</strong><br /><br />
 				
 				When using in The Loop in any template, you can use $post->ID as the first argument to pass the current post ID being processed.
 				</div>
@@ -139,17 +139,25 @@ if ( ! class_exists( 'BL_Admin' ) ) {
 
 } //endif
 
-function OutputBilingualLink($post_id, $linktext = "Translation", $beforelink = "<div class='BilingualLink'>", $afterlink = "</div>", $defaulturl = "")
+function OutputBilingualLink($post_id, $linktext = "Translation", $beforelink = "<div class='BilingualLink'>", $afterlink = "</div>", $defaulturl = "", $echo = true)
 {
 	$otherlangurl = get_post_meta($post_id, "bilingual-linker-other-lang-url", true);
 	
 	if ($otherlangurl != '')
 	{
-		echo $beforelink . "<a href='" . $otherlangurl . "'>" . $linktext . "</a>" . $afterlink;
+            $output = $beforelink . "<a href='" . $otherlangurl . "'>" . $linktext . "</a>" . $afterlink;
+            if ($echo == true)
+                echo $output;
+            else
+                return $output;
 	}
         elseif ($otherlangurl == '' && $defaulturl != '')
         {
-            echo $beforelink . "<a href='" . $defaulturl . "'>" . $linktext . "</a>" . $afterlink;
+            $output = $beforelink . "<a href='" . $defaulturl . "'>" . $linktext . "</a>" . $afterlink;
+            if ($echo == true)
+                echo $output;
+            else
+                return $output;            
         }
 }
 

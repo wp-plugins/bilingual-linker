@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 1.2.3 =
+* Added option to specify whether the link should be echoed or sent as a function return value
+
 = 1.2.2 =
 * Added option to OutputBilingualLink to be able to provide a default URL to display if no translation link is found
 
