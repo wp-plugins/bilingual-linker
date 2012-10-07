@@ -29,6 +29,12 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0 =
+* Added support for multiple languages
+* Added ability to assign translation links to categories
+* Translation display link now works on all page types (front page, archives, search results, categories, tag)
+* Created new display function (the_bilingual_link)
+
 = 1.2.3 =
 * Added option to specify whether the link should be echoed or sent as a function return value
 
