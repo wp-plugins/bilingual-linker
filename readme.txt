@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0.1 =
+* Corrected problem with category meta table creation code
+
 = 2.0 =
 * Added support for multiple languages
 * Added ability to assign translation links to categories

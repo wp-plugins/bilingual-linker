@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.0
+Version: 2.0.1
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 Network: true
@@ -55,7 +55,6 @@ function bilingual_linker_install() {
         `meta_key` varchar(255) DEFAULT NULL,
         `meta_value` longtext,
         PRIMARY KEY (`meta_id`),
-        KEY `post_id` (`post_id`),
         KEY `meta_key` (`meta_key`)
         );';
     
