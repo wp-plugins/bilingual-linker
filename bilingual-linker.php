@@ -6,7 +6,6 @@ Description: Allows for the storage and retrieve of custom links for translation
 Version: 2.0.1
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
-Network: true
 */
 
 if (is_file(trailingslashit(ABSPATH.PLUGINDIR).'bilingual-linker.php')) {
