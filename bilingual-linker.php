@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.0.1
+Version: 2.0.2
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 */
@@ -19,22 +19,26 @@ require_once(ABSPATH . '/wp-admin/includes/template.php');
 
 function bilingual_linker_install() {
 	global $wpdb;
-	
-	$postextradataquery = "select * from " . $wpdb->get_blog_prefix() . "posts_extrainfo";
-	$extradata = $wpdb->get_results($postextradataquery, ARRAY_A);
-	
-	if ($extradata)
-	{
-		foreach($extradata as $datarec)
-		{
-			update_post_meta($datarec['post_id'], "bilingual-linker-other-lang-url-1", $datarec['post_otherlang_url']);
-		}
-	}
-	
-	$wpdb->posts_extrainfo = $wpdb->get_blog_prefix() .'posts_extrainfo';
 
-	$result = $wpdb->query("DROP TABLE `$wpdb->posts_extrainfo`");
-    
+	$table_name = $wpdb->get_blog_prefix() . "posts_extrainfo";
+
+	if( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name ) {
+		$postextradataquery = "select * from " . $wpdb->get_blog_prefix() . "posts_extrainfo";
+		$extradata = $wpdb->get_results($postextradataquery, ARRAY_A);
+
+		if ($extradata)
+		{
+			foreach($extradata as $datarec)
+			{
+				update_post_meta($datarec['post_id'], "bilingual-linker-other-lang-url-1", $datarec['post_otherlang_url']);
+			}
+		}
+
+		$wpdb->posts_extrainfo = $wpdb->get_blog_prefix() .'posts_extrainfo';
+
+		$result = $wpdb->query("DROP TABLE `$wpdb->posts_extrainfo`");
+	}
+
     $wpdb->query("update " . $wpdb->get_blog_prefix() . "postmeta set meta_key = 'bilingual-linker-other-lang-url-1' where meta_key = 'bilingual-linker-other-lang-url'");
     
     if ( get_option( 'BilingualLinkerGeneral' ) === false ) {
@@ -115,8 +119,8 @@ if ( ! class_exists( 'BL_Admin' ) ) {
 
 		function add_config_page() {
 			if ( function_exists('add_submenu_page') ) {
-				add_options_page('Bilingual Linker for Wordpress', 'Bilingual Linker', 9, basename(__FILE__), array('BL_Admin','config_page'));
-				add_filter( 'plugin_action_links', array( 'BL_Admin', 'filter_plugin_actions'), 10, 2 );
+				add_options_page('Bilingual Linker for Wordpress', 'Bilingual Linker', 'edit_pages', basename(__FILE__), array( $this,'config_page'));
+				add_filter( 'plugin_action_links', array( $this, 'filter_plugin_actions'), 10, 2 );
 			}
 			
 			if ( function_exists( 'get_post_types' ) )
@@ -223,7 +227,7 @@ if ( ! class_exists( 'BL_Admin' ) ) {
             
             
             if (!$term_id) return;
-            
+
             if ( isset( $_POST['bl_otherlang_link_1'] ) ) {
                 update_metadata( $_POST['taxonomy'], $term_id, "bilingual-linker-other-lang-url-1", $_POST['bl_otherlang_link_1'] );
             }
@@ -295,15 +299,15 @@ if ( ! class_exists( 'BL_Admin' ) ) {
                     <tr>
                         <td>Language # <?php echo $langcounter; ?></td>
                         
-                        <td><input type="text" name="language<?php echo $langcounter; ?>name" value="<?php echo esc_attr($genoptions['language' . $langcounter . 'name']); ?>"></input></td>
+                        <td><input type="text" name="language<?php echo $langcounter; ?>name" value="<?php if ( isset( $genoptions['language' . $langcounter . 'name'] ) && !empty( $genoptions['language' . $langcounter . 'name'] ) ) echo esc_attr($genoptions['language' . $langcounter . 'name']); ?>"></input></td>
                         
-                        <td><input type="text" name="language<?php echo $langcounter; ?>defaulturl" value="<?php echo esc_attr($genoptions['language' . $langcounter . 'defaulturl']); ?>"></input></td>
+                        <td><input type="text" name="language<?php echo $langcounter; ?>defaulturl" value="<?php if ( isset( $genoptions['language' . $langcounter . 'defaulturl'] ) && !empty( $genoptions['language' . $langcounter . 'name'] ) ) echo esc_attr($genoptions['language' . $langcounter . 'defaulturl']); ?>"></input></td>
                         
-                        <td><input type="text" name="language<?php echo $langcounter; ?>beforelink" value="<?php echo esc_attr($genoptions['language' . $langcounter . 'beforelink']); ?>"></input></td>
+                        <td><input type="text" name="language<?php echo $langcounter; ?>beforelink" value="<?php if ( isset( $genoptions['language' . $langcounter . 'beforelink'] ) && !empty( $genoptions['language' . $langcounter . 'name'] ) ) echo esc_attr($genoptions['language' . $langcounter . 'beforelink']); ?>"></input></td>
                         
-                        <td><input type="text" name="language<?php echo $langcounter; ?>linktext" value="<?php echo esc_attr($genoptions['language' . $langcounter . 'linktext']); ?>"></input></td>
+                        <td><input type="text" name="language<?php echo $langcounter; ?>linktext" value="<?php if ( isset( $genoptions['language' . $langcounter . 'linktext'] ) && !empty( $genoptions['language' . $langcounter . 'name'] ) ) echo esc_attr($genoptions['language' . $langcounter . 'linktext']); ?>"></input></td>
                         
-                        <td><input type="text" name="language<?php echo $langcounter; ?>afterlink" value="<?php echo esc_attr($genoptions['language' . $langcounter . 'afterlink']); ?>"></input></td>
+                        <td><input type="text" name="language<?php echo $langcounter; ?>afterlink" value="<?php if ( isset( $genoptions['language' . $langcounter . 'afterlink'] ) && !empty( $genoptions['language' . $langcounter . 'name'] ) ) echo esc_attr($genoptions['language' . $langcounter . 'afterlink']); ?>"></input></td>
 
 
                     </tr>

@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0.2 =
+* Corrected PHP Warnings
+
 = 2.0.1 =
 * Corrected problem with category meta table creation code
 
