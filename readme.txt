@@ -29,6 +29,10 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0.3 =
+* Added shortcode [the-bilingual-link]
+* Added field to configure hreflang
+
 = 2.0.2 =
 * Corrected PHP Warnings
 
