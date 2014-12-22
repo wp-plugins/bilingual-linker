@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.0.3
+Version: 2.0.4
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 */
@@ -15,6 +15,23 @@ if ( is_file( trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker.php' ) 
 }
 
 require_once( ABSPATH . '/wp-admin/includes/template.php' );
+
+function bilingual_linker_reset_options ( $setoptions = 'return' ) {
+	$new_options['numberoflanguages']   = 1;
+	$new_options['language1name']       = 'French';
+	$new_options['language1langcode']   = 'French';
+	$new_options['language1linktext']   = 'French';
+	$new_options['language1beforelink'] = '';
+	$new_options['language1afterlink']  = '';
+	$new_options['language1defaulturl'] = 'wordpress.org';
+	$new_options['hideifempty']         = false;
+
+	if ( $setoptions == 'return_and_set' ) {
+		add_option( 'BilingualLinkerGeneral', $new_options );
+	}
+
+	return $new_options;
+}
 
 function bilingual_linker_install() {
 	global $wpdb;
@@ -39,13 +56,7 @@ function bilingual_linker_install() {
 	$wpdb->query( 'update ' . $wpdb->get_blog_prefix() . 'postmeta set meta_key = "bilingual-linker-other-lang-url-1" where meta_key = "bilingual-linker-other-lang-url"' );
 
 	if ( get_option( 'BilingualLinkerGeneral' ) === false ) {
-		$new_options['numberoflanguages']   = 1;
-		$new_options['language1name']       = 'French';
-		$new_options['language1linktext']   = 'French';
-		$new_options['language1beforelink'] = '';
-		$new_options['language1afterlink']  = '';
-		$new_options['language1defaulturl'] = 'wordpress.org';
-		add_option( 'BilingualLinkerGeneral', $new_options );
+		bilingual_linker_reset_options( 'return_and_set' );
 	}
 
 	$creation_query =
@@ -279,6 +290,7 @@ function bl_save_category_new_fields( $term_id, $tt_id ) {
 
 function config_page() {
 $genoptions = get_option( 'BilingualLinkerGeneral' );
+$genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'return' ) );
 ?>
 
 <div class="wrap" id='bladmin' style='width:1000px'>
@@ -365,6 +377,11 @@ $genoptions = get_option( 'BilingualLinkerGeneral' );
 
 
 				</tr>
+				<tr><td></td></tr>
+				<tr>
+					<td>Hide if no translation available</td>
+					<td><input type="checkbox" id="hideifempty" name="hideifempty" <?php checked( $genoptions['hideifempty'] ); ?> /></td>
+				</tr>
 			<?php } ?>
 
 		</table>
@@ -430,6 +447,19 @@ $genoptions = get_option( 'BilingualLinkerGeneral' );
 			}
 		}
 
+		foreach (
+			array(
+				'hideifempty'
+			) as $option_name
+		) {
+			if ( isset( $_POST[ $option_name ] ) ) {
+				$options[ $option_name ] = true;
+			} else {
+				$options[ $option_name ] = false;
+			}
+		}
+
+
 		// Store updated options array to database
 		update_option( 'BilingualLinkerGeneral', $options );
 
@@ -469,7 +499,7 @@ $genoptions = get_option( 'BilingualLinkerGeneral' );
 		$language_id = '', $post_id = '', $link_text = '',
 		$before_link = '', $after_link = '',
 		$default_url = '', $echo = true,
-		$href_lang_code = ''
+		$href_lang_code = '', $hide_if_empty = false
 	) {
 
 		$gen_options = get_option( 'BilingualLinkerGeneral' );
@@ -485,6 +515,8 @@ $genoptions = get_option( 'BilingualLinkerGeneral' );
 		$final_link_text = ! empty( $link_text ) ? $link_text : $gen_options[ 'language' . $lang_id . 'linktext' ];
 
 		$final_default_url = ! empty( $default_url ) ? $default_url : $gen_options[ 'language' . $lang_id . 'defaulturl' ];
+
+		$hide_if_empty = ! empty( $hide_if_empty ) ? $hide_if_empty : $gen_options[ 'hideifempty' ];
 
 		$output = '';
 
@@ -512,7 +544,7 @@ $genoptions = get_option( 'BilingualLinkerGeneral' );
 
 				$output = $code_before_link . '<a href="' . $other_lang_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
 
-			} elseif ( empty( $other_lang_url ) && ! empty( $final_default_url ) ) {
+			} elseif ( empty( $other_lang_url ) && !$hide_if_empty && ! empty( $final_default_url ) ) {
 
 				$output = $code_before_link . '<a href="' . $final_default_url . '" '. ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
 
