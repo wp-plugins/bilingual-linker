@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.0.2
+Version: 2.0.3
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 */
