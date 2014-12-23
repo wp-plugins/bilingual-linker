@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0.5 =
+* Added options to hide translation link on front page, search page, archive pages and category pages
+
 = 2.0.4 =
 * Added option to be able to hide translation links on pages that don't have a translation
 
