@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0.6 =
+* Corrected issue with new menu suppression options
+
 = 2.0.5 =
 * Added options to hide translation link on front page, search page, archive pages and category pages
 
