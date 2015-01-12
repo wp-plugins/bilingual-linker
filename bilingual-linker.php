@@ -3,11 +3,10 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.0.6
+Version: 2.0.7
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 */
-
 if ( is_file( trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker.php' ) ) {
 	define( 'BL_FILE', trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker.php' );
 } else if ( is_file( trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker/bilingual-linker.php' ) ) {
@@ -366,17 +365,17 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 
 					<td>
 						<input type="text" name="language<?php echo $langcounter; ?>beforelink" value="<?php if ( isset( $genoptions[ 'language' . $langcounter . 'beforelink' ] ) && ! empty( $genoptions[ 'language' . $langcounter . 'name' ] ) ) {
-							echo esc_attr( $genoptions[ 'language' . $langcounter . 'beforelink' ] );
+							echo esc_attr( stripslashes( $genoptions[ 'language' . $langcounter . 'beforelink' ] ) );
 						} ?>" /></td>
 
 					<td>
 						<input type="text" name="language<?php echo $langcounter; ?>linktext" value="<?php if ( isset( $genoptions[ 'language' . $langcounter . 'linktext' ] ) && ! empty( $genoptions[ 'language' . $langcounter . 'name' ] ) ) {
-							echo esc_attr( $genoptions[ 'language' . $langcounter . 'linktext' ] );
+							echo esc_attr( stripslashes( $genoptions[ 'language' . $langcounter . 'linktext' ] ) );
 						} ?>" /></td>
 
 					<td>
 						<input type="text" name="language<?php echo $langcounter; ?>afterlink" value="<?php if ( isset( $genoptions[ 'language' . $langcounter . 'afterlink' ] ) && ! empty( $genoptions[ 'language' . $langcounter . 'name' ] ) ) {
-							echo esc_attr( $genoptions[ 'language' . $langcounter . 'afterlink' ] );
+							echo esc_attr( stripslashes( $genoptions[ 'language' . $langcounter . 'afterlink' ] ) );
 						} ?>" /></td>
 
 
@@ -463,7 +462,7 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		) {
 			if ( isset( $_POST[ $option_name ] ) ) {
 				$options[ $option_name ] =
-					sanitize_text_field( $_POST[ $option_name ] );
+					$_POST[ $option_name ];
 			}
 		}
 
@@ -509,9 +508,9 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 
 		$lang_id = ! empty( $language_id ) ? $language_id : 1;
 		$href_lang_code = ! empty( $href_lang_code ) ? $href_lang_code : $gen_options[ 'language' . $lang_id . 'langcode' ];
-		$code_before_link = ! empty( $before_link ) ? $before_link : $gen_options[ 'language' . $lang_id . 'beforelink' ];
-		$code_after_link = ! empty( $after_link ) ? $after_link : $gen_options[ 'language' . $lang_id . 'afterlink' ];
-		$final_link_text = ! empty( $link_text ) ? $link_text : $gen_options[ 'language' . $lang_id . 'linktext' ];
+		$code_before_link = ! empty( $before_link ) ? $before_link : stripslashes( $gen_options[ 'language' . $lang_id . 'beforelink' ] );
+		$code_after_link = ! empty( $after_link ) ? $after_link : stripslashes( $gen_options[ 'language' . $lang_id . 'afterlink' ] );
+		$final_link_text = ! empty( $link_text ) ? $link_text : stripslashes( $gen_options[ 'language' . $lang_id . 'linktext' ] );
 		$final_default_url = ! empty( $default_url ) ? $default_url : $gen_options[ 'language' . $lang_id . 'defaulturl' ];
 		$hide_single = ! empty( $hide_single ) ? $hide_single : $gen_options[ 'hidesingle' ];
 		$hide_front_page = ! empty( $hide_front_page ) ? $hide_front_page : $gen_options[ 'hidefrontpage' ];

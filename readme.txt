@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0.7 =
+* Corrected issue preventing users from specifying HTML in link test, before and after fields in admin panel
+
 = 2.0.6 =
 * Corrected issue with new menu suppression options
 
