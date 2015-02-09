@@ -29,6 +29,10 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.0.8 =
+* Modified the_bilingual_linker function so it can accept arguments as an array
+* Added new option url_only that only echoes or returns the translation URL. This option is only available when sending options as an array.
+
 = 2.0.7 =
 * Corrected issue preventing users from specifying HTML in link test, before and after fields in admin panel
 

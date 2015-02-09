@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.0.7
+Version: 2.0.8
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 */
@@ -308,8 +308,9 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		The function can be used without any arguments::<br />
 		<strong>the_bilingual_link();</strong><br /><br />
 		Optionally, it can be called with the following arguments:<br /><br />
-		<strong>the_bilingual_link($language_id, $post_id, $link_text, $before_link,
-			$after_link, $default_url, $echo, $href_lang_code, $hide_single, $hide_front_page, $hide_search_page, $hide_archive_pages, $hide_category_pages);</strong><br /><br />
+		<strong>
+			the_bilingual_link($args_array);</strong><br />
+		    Where the following array parameters can be sent: language_id, post_id, link_text, before_link, after_link, default_url, echo, href_lang_code, hide_single, hide_front_page, hide_search_page, hide_archive_pages, hide_category_pages, url_only<br /><br />
 
 
 		When using in The Loop in any template, you can use $post->ID as the second argument to pass the current post ID being processed.
@@ -495,6 +496,7 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 
 	} //endif
 
+
 	function the_bilingual_link(
 		$language_id = '', $post_id = '', $link_text = '',
 		$before_link = '', $after_link = '',
@@ -503,6 +505,30 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 	    $hide_front_page = false, $hide_search_page = false,
 	    $hide_archive_pages = false, $hide_category_pages = false
 	) {
+		$default_args = array(
+			'language_id' => '',
+			'post_id' => '',
+			'link_text' => '',
+			'before_link' => '',
+			'after_link' => '',
+			'default_url' => '',
+			'echo' => true,
+			'href_lang_code' => '',
+			'hide_single' => false,
+			'hide_front_page' => false,
+			'hide_search_page' => false,
+			'hide_archive_pages' => false,
+			'hide_category_pages' => false,
+			'url_only' => false
+		);
+
+		if ( is_array( $language_id ) || func_num_args() == 0 ) {
+			if ( func_num_args() == 0 ) {
+				$language_id = array();
+			}
+			$parsed_args = wp_parse_args( $language_id, $default_args );
+			extract( $parsed_args );
+		}
 
 		$gen_options = get_option( 'BilingualLinkerGeneral' );
 
@@ -519,6 +545,7 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		$hide_category_pages = ! empty( $hide_category_pages ) ? $hide_category_pages : $gen_options[ 'hidecategorypages' ];
 
 		$output = '';
+		$url_output = '';
 
 		if ( preg_match( "#https?://#", $final_default_url ) === 0 ) {
 			$final_default_url = 'http://' . $final_default_url;
@@ -527,11 +554,13 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		if ( is_front_page() && !$hide_front_page ) {
 
 			$output = $code_before_link . '<a href="' . $final_default_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
+			$url_output = $final_default_url;
 
 		} elseif ( is_search() && !$hide_search_page ) {
 
 			$search_url = add_query_arg( 's', $_GET['s'], $final_default_url );
 			$output     = $code_before_link . '<a href="' . $search_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
+			$url_output = $search_url;
 
 		} elseif ( is_page() || is_single() ) {
 
@@ -543,11 +572,12 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 				}
 
 				$output = $code_before_link . '<a href="' . $other_lang_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
+				$url_output = $other_lang_url;
 
 			} elseif ( empty( $other_lang_url ) && !$hide_single && ! empty( $final_default_url ) ) {
 
 				$output = $code_before_link . '<a href="' . $final_default_url . '" '. ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
-
+				$url_output = $final_default_url;
 			}
 		} elseif ( is_category() && !$hide_category_pages ) {
 
@@ -560,11 +590,12 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 				}
 
 				$output = $code_before_link . '<a href="' . $other_lang_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
+				$url_output = $other_lang_url;
 
 			} elseif ( empty( $other_lang_url ) && ! empty( $final_default_url ) ) {
 
 				$output = $code_before_link . '<a href="' . $final_default_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
-
+				$url_output = $final_default_url;
 			}
 
 		} else if ( ( is_archive() && ( is_date() || is_year() || is_month() ) ) && !$hide_archive_pages ) {
@@ -585,15 +616,25 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 			}
 
 			$output = $code_before_link . '<a href="' . $archive_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
+			$url_output = $archive_url;
 
 		} elseif ( !is_front_page() && !is_search() && !is_page() && !is_single() && !is_category() && !is_archive() ) {
 			$output = $code_before_link . '<a href="' . $final_default_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
+			$url_output = $final_default_url;
 		}
 
 		if ( $echo == true ) {
-			echo $output;
+			if ( !isset( $url_only ) || false == $url_only ) {
+				echo $output;
+			} elseif ( isset( $url_only ) && true == $url_only ) {
+				echo $url_output;
+			}
 		} else {
-			return $output;
+			if ( !isset( $url_only ) || false == $url_only ) {
+				return $output;
+			} elseif ( isset( $url_only ) && true == $url_only ) {
+				return $url_output;
+			}
 		}
 	}
 
@@ -614,22 +655,8 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 	add_shortcode( 'the-bilingual-link', 'bl_shortcode' );
 
 	function bl_shortcode( $atts ) {
-		extract(shortcode_atts(array(
-			'language_id' => '',
-			'post_id' => '',
-			'link_text' => '',
-			'before_link' => '',
-			'after_link' => '',
-			'default_url' => '',
-			'href_lang_code' => '',
-			'hide_single' => false,
-			'hide_front_page' => false,
-			'hide_search_page' => false,
-			'hide_archive_pages' => false,
-			'hide_category_pages' => false
-		), $atts));
-
-		return the_bilingual_link( $language_id, $post_id, $link_text, $before_link, $after_link, $default_url, false, $href_lang_code, $hide_single, $hide_front_page, $hide_search_page, $hide_archive_pages, $hide_category_pages );
+		$atts['echo'] = false;
+		return the_bilingual_link( $atts );
 	}
 
 
