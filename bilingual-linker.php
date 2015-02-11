@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.0.8
+Version: 2.1
 Author: Yannick Lefebvre
 Author URI: http://yannickcorner.nayanna.biz/
 */
@@ -97,7 +97,60 @@ function __construct() {
 }
 
 function bl_admin_init() {
+	$this->bl_add_nav_menu_meta_box();
+
 	add_action( 'admin_post_save_bl_options', array( $this, 'process_bl_options' ) );
+}
+
+function bl_add_nav_menu_meta_box(){
+	global $pagenow;
+	if ( 'nav-menus.php' !== $pagenow ){
+		return;
+	}
+
+	add_meta_box(
+		'bilingual_linker_item_meta_box'
+		,__( 'Bilingual Linker', 'bilingual-linker-item' )
+		, array( $this, 'bilingual_linker_box_render' )
+		,'nav-menus'
+		,'side'
+		,'low'
+	);
+}
+
+function bilingual_linker_box_render(){
+	global $_nav_menu_placeholder, $nav_menu_selected_id;
+
+	$_nav_menu_placeholder = 0 > $_nav_menu_placeholder ? $_nav_menu_placeholder - 1 : -1;
+
+	$gen_options = get_option( 'BilingualLinkerGeneral' );
+
+	$final_default_url = 'http://test.com';
+	?>
+	<div class="customlinkdiv" id="searchboxitemdiv">
+		<div class="tabs-panel-active">
+			<ul class="categorychecklist">
+				<li>
+					<input type="hidden" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-type]" value="custom">
+					<input type="hidden" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-type_label]" value="Bilingual Link">
+
+					<input type="hidden" class="menu-item-title" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-title]" value="Bilingual Linker">
+					<input type="hidden" class="menu-item-url" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-url]" value="<?php echo $final_default_url; ?>">
+					<input type="hidden" class="menu-item-classes" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-classes]" value="bilingual-link">
+
+					<input type="checkbox" class="menu-item-object-id" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-object-id]" value="<?php echo $_nav_menu_placeholder; ?>" checked="true">
+				</li>
+			</ul>
+		</div>
+
+		<p class="button-controls">
+				<span class="add-to-menu">
+					<input type="submit"<?php wp_nav_menu_disabled_check( $nav_menu_selected_id ); ?> class="button-secondary right" value="<?php esc_attr_e( 'Add to menu', 'bop-nav-search-box-item' ); ?>" name="add-search-menu-item" id="submit-searchboxitemdiv">
+					<span class="spinner"></span>
+				</span>
+		</p>
+	</div>
+<?php
 }
 
 function bl_admin_scripts() {
@@ -659,5 +712,29 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		return the_bilingual_link( $atts );
 	}
 
+	add_filter( 'walker_nav_menu_start_el', 'bl_walker_nav_menu_start_el', 1, 4 );
 
-?>
+	function bl_walker_nav_menu_start_el( $item_output, $item, $depth, $args ){
+
+		if( $item->type != 'custom' && !in_array( 'BILINGUAL-LINK', $item->classes ) ) {
+			return $item_output;
+		}
+
+		$classes = empty( $item->classes ) ? array() : (array) $item->classes;
+		$classes[] = 'menu-item-' . $item->ID;
+		$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args, $depth ) );
+		$class_names = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
+
+		$id = apply_filters( 'nav_menu_item_id', 'menu-item-'. $item->ID, $item, $args, $depth );
+		$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
+
+		$item_output = $args->before;
+
+		$item_output .= the_bilingual_link( array( 'echo' => false ) );
+
+		$item_output .= $args->after;
+
+		return $item_output;
+	}
+
+	?>

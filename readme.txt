@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.1 =
+* Added new item in WordPress menu builder to be able to easily add Bilingual Linker link to menu
+
 = 2.0.8 =
 * Modified the_bilingual_linker function so it can accept arguments as an array
 * Added new option url_only that only echoes or returns the translation URL. This option is only available when sending options as an array.
