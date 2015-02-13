@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.1.1 =
+* Fix for menu items all showing translation link
+
 = 2.1 =
 * Added new item in WordPress menu builder to be able to easily add Bilingual Linker link to menu
 
