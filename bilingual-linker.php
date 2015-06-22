@@ -5,7 +5,7 @@ Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
 Version: 2.1.2
 Author: Yannick Lefebvre
-Author URI: http://yannickcorner.nayanna.biz/
+Author URI: http://ylefebvre.ca/
 */
 if ( is_file( trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker.php' ) ) {
 	define( 'BL_FILE', trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker.php' );
