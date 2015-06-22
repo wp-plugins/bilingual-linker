@@ -1,6 +1,6 @@
 === Bilingual Linker ===
 Contributors: jackdewey
-Donate link: http://yannickcorner.nayanna.biz/wordpress-plugins/bilingual-linker
+Donate link: http://ylefebvre.ca/wordpress-plugins/bilingual-linker
 Tags: translation, link, bilingual
 Requires at least: 3.0
 Tested up to: 4.2
