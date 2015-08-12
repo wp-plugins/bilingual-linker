@@ -29,6 +29,9 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.2 =
+* Added support for custom post type archive pages
+
 = 2.1.2 =
 * Fix for potential XSS vulnerability
 

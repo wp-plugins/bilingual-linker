@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.1.2
+Version: 2.2
 Author: Yannick Lefebvre
 Author URI: http://ylefebvre.ca/
 */
@@ -653,25 +653,43 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 
 		} else if ( ( is_archive() && ( is_date() || is_year() || is_month() ) ) && !$hide_archive_pages ) {
 
-			if ( is_year() ) {
-				$archive_url = add_query_arg( 'year', get_query_var( 'year' ), $final_default_url );
-			} elseif ( is_month() ) {
-				$archive_url = add_query_arg( array(
-					'year'     => get_query_var( 'year' ),
-					'monthnum' => get_query_var( 'monthnum' )
-				), $final_default_url );
-			} elseif ( is_day() ) {
-				$archive_url = add_query_arg( array(
-					'year'     => get_query_var( 'year' ),
-					'monthnum' => get_query_var( 'monthnum' ),
-					'day'      => get_query_var( 'day' )
-				), $final_default_url );
+			if ( is_archive() ) {
+				if ( is_year() ) {
+					$archive_url = add_query_arg( 'year', get_query_var( 'year' ), $final_default_url );
+				} elseif ( is_month() ) {
+					$archive_url = add_query_arg( array(
+						'year'     => get_query_var( 'year' ),
+						'monthnum' => get_query_var( 'monthnum' )
+					), $final_default_url );
+				} elseif ( is_day() ) {
+					$archive_url = add_query_arg( array(
+						'year'     => get_query_var( 'year' ),
+						'monthnum' => get_query_var( 'monthnum' ),
+						'day'      => get_query_var( 'day' )
+					), $final_default_url );
+				}
 			}
 
 			$output = $code_before_link . '<a href="' . esc_url( $archive_url ) . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
 			$url_output = $archive_url;
 
-		} elseif ( !is_front_page() && !is_search() && !is_page() && !is_single() && !is_category() && !is_archive() ) {
+		} elseif ( is_post_type_archive() ) {
+			$paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+
+			if ( $paged > 1 ) {
+				$archive_url = add_query_arg( array(
+					'post_type' => get_post_type(),
+					'paged'     => ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1
+				), $final_default_url );
+			} else {
+				$archive_url = add_query_arg( array(
+					'post_type' => get_post_type()
+				), $final_default_url );
+			}
+
+			$output = $code_before_link . '<a href="' . esc_url( $archive_url ) . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
+			$url_output = $archive_url;
+		} elseif ( !is_front_page() && !is_search() && !is_page() && !is_single() && !is_category() && !is_archive() && !is_post_type_archive() ) {
 			$output = $code_before_link . '<a href="' . $final_default_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
 			$url_output = $final_default_url;
 		}
