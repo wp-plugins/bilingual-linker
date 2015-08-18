@@ -3,7 +3,7 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.2
+Version: 2.2.1
 Author: Yannick Lefebvre
 Author URI: http://ylefebvre.ca/
 */
@@ -596,7 +596,7 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		$hide_search_page = ! empty( $hide_search_page ) ? $hide_search_page : $gen_options[ 'hidesearchpage' ];
 		$hide_archive_pages = ! empty( $hide_archive_pages ) ? $hide_archive_pages : $gen_options[ 'hidearchivepages' ];
 		$hide_category_pages = ! empty( $hide_category_pages ) ? $hide_category_pages : $gen_options[ 'hidecategorypages' ];
-
+		
 		$output = '';
 		$url_output = '';
 
@@ -733,10 +733,9 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 	add_filter( 'walker_nav_menu_start_el', 'bl_walker_nav_menu_start_el', 1, 4 );
 
 	function bl_walker_nav_menu_start_el( $item_output, $item, $depth, $args ){
-
 		if( $item->type != 'custom' ) {
 			return $item_output;
-		} elseif ( !in_array( 'BILINGUAL-LINK', $item->classes ) ) {
+		} elseif ( !in_array( 'bilingual-link', $item->classes ) ) {
 			return $item_output;
 		}
 
@@ -753,7 +752,7 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		$item_output .= the_bilingual_link( array( 'echo' => false ) );
 
 		$item_output .= $args->after;
-
+		
 		return $item_output;
 	}
 
