@@ -3,15 +3,10 @@
 Plugin Name: Bilingual Linker
 Plugin URI: http://wordpress.org/extend/plugins/translation-linker/
 Description: Allows for the storage and retrieve of custom links for translation of post/pages
-Version: 2.2.1
+Version: 2.2.3
 Author: Yannick Lefebvre
 Author URI: http://ylefebvre.ca/
 */
-if ( is_file( trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker.php' ) ) {
-	define( 'BL_FILE', trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker.php' );
-} else if ( is_file( trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker/bilingual-linker.php' ) ) {
-	define( 'BL_FILE', trailingslashit( ABSPATH . PLUGINDIR ) . 'bilingual-linker/bilingual-linker.php' );
-}
 
 require_once( ABSPATH . '/wp-admin/includes/template.php' );
 
@@ -604,8 +599,13 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 			$final_default_url = 'http://' . $final_default_url;
 		}
 
-		if ( is_front_page() && !$hide_front_page ) {
+		$other_lang_url = get_post_meta( get_the_ID(), 'bilingual-linker-other-lang-url-' . $lang_id, true );
 
+		if ( is_home() && 0 != get_option( 'page_for_posts' ) ) {
+			$other_lang_url = get_post_meta( get_option( 'page_for_posts' ), 'bilingual-linker-other-lang-url-' . $lang_id, true );
+		}
+
+		if ( is_front_page() && !$hide_front_page && ( 'page' != get_option( 'show_on_front' ) || ( 'page' == get_option( 'show_on_front' ) && empty( $other_lang_url ) ) ) ) {
 			$output = $code_before_link . '<a href="' . $final_default_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
 			$url_output = $final_default_url;
 
@@ -615,11 +615,8 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 			$output     = $code_before_link . '<a href="' . $search_url . '" ' . ( !empty( $href_lang_code ) ? 'rel="alternate" hreflang="' . $href_lang_code . '"' : '' ) . '>' . $final_link_text . '</a>' . $code_after_link;
 			$url_output = $search_url;
 
-		} elseif ( is_page() || is_single() ) {
-
-			$other_lang_url = get_post_meta( get_the_ID(), 'bilingual-linker-other-lang-url-' . $lang_id, true );
-
-			if ( $other_lang_url != '' ) {
+		} elseif ( is_home() || is_page() || is_single() || ( is_front_page() && 'page' == get_option( 'show_on_front' ) && !empty( $other_lang_url ) ) ) {
+			if ( !empty( $other_lang_url ) ) {
 				if ( preg_match( "#https?://#", $other_lang_url ) === 0 ) {
 					$other_lang_url = 'http://' . $other_lang_url;
 				}
@@ -636,7 +633,7 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 
 			$other_lang_url = get_metadata( 'category', get_query_var( 'cat' ), 'bilingual-linker-other-lang-url-' . $lang_id, true );
 
-			if ( $other_lang_url != '' ) {
+			if ( !empty( $other_lang_url ) ) {
 
 				if ( preg_match( "#https?://#", $other_lang_url ) === 0 ) {
 					$other_lang_url = 'http://' . $other_lang_url;
@@ -709,7 +706,7 @@ $genoptions = wp_parse_args( $genoptions, bilingual_linker_reset_options( 'retur
 		}
 	}
 
-	register_activation_hook( BL_FILE, 'bilingual_linker_install' );
+	register_activation_hook( __FILE__, 'bilingual_linker_install' );
 
 	if ( is_admin() ) {
 		$my_bl_admin = new BL_Admin();

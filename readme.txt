@@ -29,6 +29,12 @@ When using in The Loop in any template, you can use $post->ID as the first argum
 
 == Changelog ==
 
+= 2.2.3 =
+* Added support to display translation link when posts page is not front page
+
+= 2.2.2 =
+* Code fix to use bilingual link set in page editor if page is used as site front page
+
 = 2.2.1 =
 * Fix for Bilingual Linker Menu item
 
